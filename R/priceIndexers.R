@@ -1,9 +1,11 @@
 # library(XML)
 
 #' Customizable XML parser for product feeds.
+#'
 #' \code{heurekaFeed2df(doc)} create a new datafraame containing the flat structure of the Heureka product feed. It skips problematics tags.
 #'
 #' This  is a XML parser optimised for Heureka feed. It can replaces \code{XML::xmlTodataframe} in all cases when this function fails for some reason.
+#' Function allow you to see debug messages and parametrize it's behavior.
 #'
 #' @param doc XML parsed document or string or file
 #' @param xpath the xpath to shopitem in the feed
@@ -21,10 +23,13 @@
 #' @export
 heurekaFeed2df <-  function(doc, xpath="//SHOPITEM", isXML = TRUE, usewhich = TRUE, verbose = TRUE, skipTags=c("PARAM","DELIVERY")) {
 
-  if (!isXML)
+  if (!isXML){
+    if(verbose) message("Parsing XML ...")
     doc = xmlParse(doc)
+  }
 
   #### get the records for that form
+  if(verbose) message("Scanning XML ...")
   nodeset <- getNodeSet(doc, xpath)
 
   ## get the field names
@@ -33,12 +38,12 @@ heurekaFeed2df <-  function(doc, xpath="//SHOPITEM", isXML = TRUE, usewhich = TR
   ## get the total fields that are in any record
   fields = unique(unlist(var.names))
   fields <- fields[!(fields %in% skipTags)]
-  if (verbose) message(fields)
+  if (verbose) message(paste("Found following tags: ",paste(fields,collapse=","),"| Excluded:", paste(skipTags, collapse=",")))
 
   ## extract the values from all fields
   dl = lapply(fields, function(x) {
     xp <- paste0(xpath, "/", x)
-    if (verbose) message(xp)
+    if (verbose) message(paste("Extracting data:",xp))
     xpathSApply(doc, xp , xmlValue)
   })
 
@@ -51,7 +56,6 @@ heurekaFeed2df <-  function(doc, xpath="//SHOPITEM", isXML = TRUE, usewhich = TR
 
   ## fill in that data.frame
   for (icol in 1:ncol(name.mat)) {
-    message(sprintf("Row %d",icol))
     rep.rows = name.mat[, icol]
     if (usewhich)
       rep.rows = which(rep.rows)
