@@ -1,4 +1,4 @@
-#WATAtools
+# WATAtools
 
 R Package containing usefull tools for digital analytics in [Etnetera Activate](http://www.activate.cz/).
 
