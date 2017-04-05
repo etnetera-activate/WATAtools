@@ -1,8 +1,7 @@
 # library(XML)
 
 #' Customizable XML parser for product feeds.
-#'
-\code{heurekaFeed2df(doc)} create a new datafraame containing the flat structure of the Heureka product feed. It skips problematics tags.
+#' \code{heurekaFeed2df(doc)} create a new datafraame containing the flat structure of the Heureka product feed. It skips problematics tags.
 #'
 #' This  is a XML parser optimised for Heureka feed. It can replaces \code{XML::xmlTodataframe} in all cases when this function fails for some reason.
 #'
