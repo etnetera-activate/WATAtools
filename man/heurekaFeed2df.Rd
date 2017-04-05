@@ -2,7 +2,8 @@
 % Please edit documentation in R/priceIndexers.R
 \name{heurekaFeed2df}
 \alias{heurekaFeed2df}
-\title{Customizable XML parser for product feeds.}
+\title{Customizable XML parser for product feeds.
+\code{heurekaFeed2df(doc)} create a new datafraame containing the flat structure of the Heureka product feed. It skips problematics tags.}
 \usage{
 heurekaFeed2df(doc, xpath = "//SHOPITEM", isXML = TRUE, usewhich = TRUE,
   verbose = TRUE, skipTags = c("PARAM", "DELIVERY"))
@@ -21,9 +22,6 @@ heurekaFeed2df(doc, xpath = "//SHOPITEM", isXML = TRUE, usewhich = TRUE,
 \item{skipTags}{is a collection of tags which will not be processed. Typically multiplve values in PARAM and DELIVERY}
 }
 \description{
-\code{heurekaFeed2df(doc)} create new datafraame containing the flat structure of the Heureka product feed. It skips problematics tags.
-}
-\details{
 This  is a XML parser optimised for Heureka feed. It can replaces \code{XML::xmlTodataframe} in all cases when this function fails for some reason.
 }
 \examples{

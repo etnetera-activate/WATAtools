@@ -18,6 +18,7 @@
 #' doc <- xmlParse("http://my.eshop.cz/heureka.xml")
 #' df <- heurekaFeed2df(doc)
 #'
+#' @export
 heurekaFeed2df <-  function(doc, xpath="//SHOPITEM", isXML = TRUE, usewhich = TRUE, verbose = TRUE, skipTags=c("PARAM","DELIVERY")) {
 
   if (!isXML)
