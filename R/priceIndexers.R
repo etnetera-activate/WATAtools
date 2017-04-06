@@ -38,11 +38,13 @@ heurekaFeed2df <-  function(doc, xpath="//SHOPITEM", isXML = TRUE, usewhich = TR
   ## get the total fields that are in any record
   fields = unique(unlist(var.names))
   fields <- fields[!(fields %in% skipTags)]
+
   if (verbose) {
     message(paste("Found tags: ",    paste(fields,collapse=",")))
     message(paste("Excluded tags: ", paste(skipTags, collapse=",")))
   }
-  ## extract the values from all fields
+
+    ## extract the values from all fields
   dl = lapply(fields, function(x) {
     xp <- paste0(xpath, "/", x)
     if (verbose) message(paste("Extracting data:",xp))
