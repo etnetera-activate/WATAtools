@@ -24,6 +24,7 @@ library(tidyr)
 #' doc <- xmlParse("http://my.eshop.cz/heureka.xml")
 #' df <- heurekaFeed2df(doc)
 #'
+#' @import XML
 #' @export
 heurekaFeed2df <-  function(doc, xpath="//SHOPITEM", isXML = TRUE, usewhich = TRUE, verbose = TRUE, skipTags=c("PARAM","DELIVERY")) {
 
@@ -84,6 +85,11 @@ heurekaFeed2df <-  function(doc, xpath="//SHOPITEM", isXML = TRUE, usewhich = TR
 #'
 #' @examples
 #' df <- getHeurekaReviews('kasa-cz')
+#'
+#' @import XML
+#' @import httr
+#' @import dplyr
+#' @import tidyr
 #'
 #' @export
 getHeurekaReviews <- function(shopName, fromDate = as.Date("1970-01-01"), verbose = T){
