@@ -1,4 +1,8 @@
-# library(XML)
+library(XML)
+library(httr)
+library(dplyr)
+library(tidyr)
+
 
 #' Customizable XML parser for product feeds.
 #'
@@ -69,4 +73,110 @@ heurekaFeed2df <-  function(doc, xpath="//SHOPITEM", isXML = TRUE, usewhich = TR
   return(df)
 }
 
+
+#' Downloads all reviews for eshop from heureka.cz
+#'
+#' \code{getHeurekaReviews(shopname)} downloads all reviews for specified eshop.
+#'
+#' @param shopName name of the eshop. Eg. datart-cz, alza-cz, etc. Data are retrieved from the eshop profile page. Eg. https://obchody.heureka.cz/kasa-cz/recenze/
+#' @param fromDate (not implemented yet)use this for limit from which date are reviews downloaded. Default is 'download all history'
+#' @param verbose indicate if debug messages should be displayed
+#'
+#' @examples
+#' df <- getHeurekaReviews('kasa-cz')
+#'
+#' @export
+getHeurekaReviews <- function(shopName, fromDate = as.Date("1970-01-01"), verbose = T){
+  #TODO: implement fromDate
+  #TODO: clean code
+
+  shopurl <- sprintf("https://obchody.heureka.cz/%s/recenze/",shopName)
+  response <- GET(shopurl)
+
+  # zjistime si kolik stranek maji recenze na URL
+  doc <- htmlParse(content(response))
+  pages <- as.numeric(xpathApply(doc, '//*[@id="text"]/p/a[5]/text()',xmlValue))
+  if(verbose)message(paste("pages:",pages))
+  out <- data.frame()
+
+  # pro kazdou stranku postune stahneme data
+  for(pageNum in 1:pages){
+    url<-sprintf("%s?f=%d",shopurl,pageNum, pages)
+    if(verbose)message(paste(url,pages,sep=" / "))
+
+    doc <- htmlParse(content(GET(url)))
+
+    #kolik je recenzi na strance. Typicky deset, ale co posledni stranka
+    numReviews <- length(xpathSApply(doc,'//*[@class="review"]'))
+
+    #postupne pro recenze sahame na elementy
+    outPage <- data.frame()
+    for(ri in 1:numReviews){
+
+      #datum recenze
+      dateXPath <- sprintf('//*[@class="review"][%d]/div[1]/p[2]/text()',ri)
+      date<-xpathSApply(doc,dateXPath,xmlValue)
+
+      #rating
+      ratingXPath <- sprintf('//*[@class="review"][%d]/div[2]/h3/big/text()',ri)
+      rating<-xpathSApply(doc,ratingXPath,xmlValue)
+
+      #rating nemusi byt vzdy vyplnen, takze pokud neni doplnime nula.
+      if(length(rating)!=1){
+        rating <- 0;
+      } else {
+        #jinak prevedem na cislo
+        rating <- as.numeric(gsub(pattern = "%",replacement = "",x = rating[[1]], fixed=T))
+      }
+      outPage <- rbind(outPage,data.frame(date=date[[1]],rating=rating))
+    }
+    out<-rbind(out, outPage)
+  }
+
+  #doplnime metadata
+  out$shopname <- shopName
+  out$dateDownload <- Sys.Date()
+
+
+  dt <- out
+  #### konverze datumu stringu na datum
+  #vycistime si to
+  dt$date <- as.character(levels(dt$date)[dt$date])
+  dt$date <- tolower(iconv(dt$date, from="utf-8",to="ASCII//TRANSLIT"))
+
+  #nahradime vyrazy 'pred 11 hodinami' a 'vcera' za datumy
+  try(dt[grepl(dt$date,pattern = "vcera"),]$date <- format(Sys.Date()-1, "%d. %m %Y"),silent = T) #vcerejsi
+  try(dt[grepl(dt$date,pattern = "(hodin|minut)"),]$date <- format(Sys.Date(), "%d. %m %Y"), silent = T) #dnesni
+
+
+  #rozpadneme na den, mesi a rok
+  dt$date <- gsub('pridano: ','',dt$date)
+  dt<-separate(dt,col=date,into=c('day','month','year'),sep = " ")
+
+  #udelame substituci za sklonovana jmena pomoci pojmenovaneho vektoru
+  czMonths <- c(
+    'ledna' = '01',
+    'unora' = '02',
+    'brezna' = '03',
+    'dubna' = '04',
+    'kvetna' = '05',
+    'cervna' = '06',
+    'cervence' = '07',
+    'srpna' = '08',
+    'zari' = '09',
+    'rijna' = '10',
+    'listopadu' = '11',
+    'prosince' = '12'
+  )
+  dt[grepl("[a-z]",dt$month),]$month <- czMonths[dt[grepl("[a-z]",dt$month),]$month]
+
+  #a konverze
+  dt$date <- as.Date(paste(dt$day, dt$month, dt$year), format="%d. %m %Y")
+  if(verbose) message("Done.")
+
+  return(dt)
+}
+
+#test
+#df <- getHeurekaReviews("gigamat-cz")
 
