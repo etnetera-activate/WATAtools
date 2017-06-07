@@ -143,11 +143,11 @@ getHeurekaReviews <- function(shopName, fromDate = as.Date("1970-01-01"), verbos
 
       for(si in 1:length(stars)){
         txt <- str_trim(stars[si])
-        if(grepl("^doporucuje obchod", txt)){star.recomends=1};
-        if(grepl("^nedoporucuje obchod", txt)){star.recomends=0};
-        if(grepl("dodaci", txt, fixed=T)){star.deliveryTime = as.numeric(substr(txt,12,14))};
-        if(grepl("prehlednost", txt, fixed=T)){star.eshopQuality = as.numeric(substr(txt,12,14))};
-        if(grepl("komunikace", txt, fixed=T)){star.communication = as.numeric(substr(txt,12,14))};
+        try(if(grepl("^doporucuje obchod", txt)){star.recomends=1});
+        try(if(grepl("^nedoporucuje obchod", txt)){star.recomends=0});
+        try(if(grepl("dodaci", txt, fixed=T)){star.deliveryTime = as.numeric(substr(txt,12,14))});
+        try(if(grepl("prehlednost", txt, fixed=T)){star.eshopQuality = as.numeric(substr(txt,12,14))});
+        try(if(grepl("komunikace", txt, fixed=T)){star.communication = as.numeric(substr(txt,12,14))});
       }
 
       #rating nemusi byt vzdy vyplnen, takze pokud neni doplnime nula.
@@ -210,6 +210,5 @@ getHeurekaReviews <- function(shopName, fromDate = as.Date("1970-01-01"), verbos
   return(dt)
 }
 
-#test
-#df <- getHeurekaReviews("gigamat-cz")
+#testdf <- getHeurekaReviews("rockpoint-cz")
 
