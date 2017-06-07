@@ -2,7 +2,7 @@ library(XML)
 library(httr)
 library(dplyr)
 library(tidyr)
-
+library(stringr)
 
 #' Customizable XML parser for product feeds.
 #'
@@ -25,6 +25,10 @@ library(tidyr)
 #' df <- heurekaFeed2df(doc)
 #'
 #' @import XML
+#' @import httr
+#' @import dplyr
+#' @import tidyr
+#' @import stringr
 #' @export
 heurekaFeed2df <-  function(doc, xpath="//SHOPITEM", isXML = TRUE, usewhich = TRUE, verbose = TRUE, skipTags=c("PARAM","DELIVERY")) {
 
@@ -127,6 +131,25 @@ getHeurekaReviews <- function(shopName, fromDate = as.Date("1970-01-01"), verbos
       ratingXPath <- sprintf('//*[@class="review"][%d]/div[2]/h3/big/text()',ri)
       rating<-xpathSApply(doc,ratingXPath,xmlValue)
 
+      #stars
+      starPath <- sprintf('//*[@class="review"][%d]/div[2]/ul',ri)
+      stars <- xpathSApply(doc,starPath,xmlValue)
+      stars <- iconv(tolower(stars), from="UTF8",to="ASCII//TRANSLIT")
+      stars <- strsplit(stars,"\n")[[1]]
+      star.recommends <- NA;
+      star.deliveryTime <- NA;
+      star.eshopQuality <- NA;
+      star.communication <- NA;
+
+      for(si in 1:length(stars)){
+        txt <- str_trim(stars[si])
+        if(grepl("^doporucuje obchod", txt)){star.recomends=1};
+        if(grepl("^nedoporucuje obchod", txt)){star.recomends=0};
+        if(grepl("dodaci", txt, fixed=T)){star.deliveryTime = as.numeric(substr(txt,12,14))};
+        if(grepl("prehlednost", txt, fixed=T)){star.eshopQuality = as.numeric(substr(txt,12,14))};
+        if(grepl("komunikace", txt, fixed=T)){star.communication = as.numeric(substr(txt,12,14))};
+      }
+
       #rating nemusi byt vzdy vyplnen, takze pokud neni doplnime nula.
       if(length(rating)!=1){
         rating <- 0;
@@ -134,7 +157,11 @@ getHeurekaReviews <- function(shopName, fromDate = as.Date("1970-01-01"), verbos
         #jinak prevedem na cislo
         rating <- as.numeric(gsub(pattern = "%",replacement = "",x = rating[[1]], fixed=T))
       }
-      outPage <- rbind(outPage,data.frame(date=date[[1]],rating=rating))
+      outPage <- rbind(outPage,data.frame(date=date[[1]],rating=rating,
+                                          star.recommends=star.recomends,
+                                          star.deliveryTime=star.deliveryTime,
+                                          star.eshopQuality=star.eshopQuality,
+                                          star.communication=star.communication))
     }
     out<-rbind(out, outPage)
   }
