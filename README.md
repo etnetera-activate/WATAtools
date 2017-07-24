@@ -14,9 +14,14 @@ And then run the `install_github` command:
 	install_github("etnetera-activate/WATAtools")
 	library(WATAtools)
 	
-## Functions
+## Functions in the package
 
 * heurekaFeed2df() ... customizable XML parser for Heureka.cz product feed
+* getHeurekaReviews() ... scraping heureka reviews given eshop
+
+## Usage example
+
+TODO
 
 
 
