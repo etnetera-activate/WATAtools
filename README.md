@@ -11,7 +11,7 @@ Install the [devtools](https://github.com/hadley/devtools) package:
 
 And then run the `install_github` command:
 
-	install_github("etnetera-activate/WATAtools")
+	devtools::install_github("etnetera-activate/WATAtools")
 	library(WATAtools)
 	
 ## Functions in the package
