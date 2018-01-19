@@ -1,5 +1,4 @@
 require(jsonlite)
-require(rjson)
 
 #' Use freegeoip.net for converting IP address to geo location
 #'
@@ -9,7 +8,7 @@ require(rjson)
 #' @example
 #' new_df <- freegeoip(my_ip, format = "dataframe")
 #'
-#' @import rjson
+#' @import jsonlite
 #'
 #' @export
 freegeoip <- function(ip, format = ifelse(length(ip)==1,'list','dataframe'))
@@ -18,7 +17,7 @@ freegeoip <- function(ip, format = ifelse(length(ip)==1,'list','dataframe'))
   {
     # a single IP address
     url <- paste(c("http://freegeoip.net/json/", ip), collapse='')
-    ret <- fr??om(readLines(url, warn=FALSE))
+    ret <- fromJSON(readLines(url, warn=FALSE))
     if (format == 'dataframe')
       ret <- data.frame(t(unlist(ret)))
     return(ret)
