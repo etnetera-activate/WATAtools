@@ -52,8 +52,8 @@ calculateDistance <- function(origin, target, mode = "driving", apikey) {
   url <- sprintf("https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s&destinations=%s&key=%s", origin, target, apikey)
   json <- jsonlite::fromJSON(url)
 
-  distance <- as.numeric(unlist(read_trans$rows)[2]) / 1000
-  time <- as.numeric(unlist(read_trans$rows)[4]) / 60
+  distance <- as.numeric(unlist(json$rows)[2]) / 1000
+  time <- as.numeric(unlist(json$rows)[4]) / 60
 
   return(list(distance = distance, time = time))
 }
