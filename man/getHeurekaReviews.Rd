@@ -20,4 +20,3 @@ getHeurekaReviews(shopName, fromDate = as.Date("1970-01-01"), verbose = T)
 df <- getHeurekaReviews('kasa-cz')
 
 }
-

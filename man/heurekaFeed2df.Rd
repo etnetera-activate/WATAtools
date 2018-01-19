@@ -34,4 +34,3 @@ doc <- xmlParse("http://my.eshop.cz/heureka.xml")
 df <- heurekaFeed2df(doc)
 
 }
-

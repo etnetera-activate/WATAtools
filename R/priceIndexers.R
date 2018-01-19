@@ -210,5 +210,3 @@ getHeurekaReviews <- function(shopName, fromDate = as.Date("1970-01-01"), verbos
   return(dt)
 }
 
-#testdf <- getHeurekaReviews("rockpoint-cz")
-
