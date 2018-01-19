@@ -49,7 +49,7 @@ freegeoip <- function(ip, format = ifelse(length(ip)==1,'list','dataframe'))
 #'
 #' @export
 calculateDistance <- function(origin, target, mode = "driving", apikey) {
-  url <- sprintf("https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s&destinations=%s&key=%s", origin, target, apikey)
+  url <- sprintf("https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s&destinations=%s&mode=%s&key=%s", origin, target,mode, apikey)
   json <- jsonlite::fromJSON(url)
 
   distance <- as.numeric(unlist(json$rows)[2]) / 1000
